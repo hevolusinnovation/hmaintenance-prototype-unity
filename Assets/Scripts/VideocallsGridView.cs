@@ -1,0 +1,49 @@
+using Agora.Rtc;
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class VideocallsGridView : MonoBehaviour
+{
+    [SerializeField] private GridLayoutGroup _gridLayoutGroup;
+
+    [SerializeField] private GameObject _localFrame;
+    [SerializeField] private GameObject _framePrefab;
+
+    private void OnValidate()
+    {
+        if (_gridLayoutGroup == null)
+            _gridLayoutGroup = this.GetComponent<GridLayoutGroup>();
+    }
+
+    private void Awake()
+    {
+        if (_framePrefab == null)
+        {
+            Debug.LogError("frame prefab is null, please assign it in inspector", this);           
+        }
+    }
+    public GameObject GetLocalFrame()
+    {
+        if (_localFrame == null)
+        {
+            Debug.LogError("Local frame not found, please assign it in inspector", this);
+            return null;
+        }
+
+        return _localFrame;
+    }
+    
+    public GameObject AddRemoteFrame()
+    {
+        if (_framePrefab == null)
+        {
+            return null;
+        }
+
+        return Instantiate(_framePrefab, this.transform);
+    }
+}

@@ -12,7 +12,7 @@ namespace Agora.Rtc
     ///
     public class VideoSurface : MonoBehaviour
     {
-        [SerializeField] protected VideoSurfaceType VideoSurfaceType = VideoSurfaceType.Renderer;
+        [SerializeField] protected VideoSurfaceType VideoSurfaceType = VideoSurfaceType.RawImage;
         [SerializeField] protected bool Enable = true;
 
         [SerializeField] protected uint Uid = 0;
