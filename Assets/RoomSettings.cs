@@ -1,7 +1,7 @@
 using LiveKit;
 using UnityEngine;
 
-public class RoomUser : RoomBehaviour
+public class RoomSettings : RoomBehaviour
 {
     [Header("Settings")]
     [SerializeField] private string _name = default;
@@ -10,18 +10,19 @@ public class RoomUser : RoomBehaviour
     [SerializeField] private bool _isMicrophoneEnabled = default;
     [SerializeField] private bool _isScreenShareEnabled = default;
 
-    private LocalParticipant _localParticipant = default;
+    private Room _localRoom = default;
 
     protected override void Inizialize()
     {
-        _localParticipant = RoomSession.Room.LocalParticipant;
+        _localRoom = RoomSession.Room;
     }
     protected override void Dispose()
     {
 
     }
 
-    public void SetParticipantName(string name) { _name = name; }   
-    public string GetParticipantName() { return _name; }
-    public LocalParticipant GetLocalParticipant() { return _localParticipant; }
+    public void SetRoomName(string name) { _name = name; }
+    public string GetRoomName() { return _name; }
+    public Room GetLocalParticipant() { return _localRoom; }
+
 }

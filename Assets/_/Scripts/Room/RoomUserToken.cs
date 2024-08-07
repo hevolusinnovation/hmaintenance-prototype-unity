@@ -1,11 +1,6 @@
-using Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare;
-using LiveKit;
-using LiveKit.Proto;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Security.Policy;
-using Unity.Properties;
 using UnityEngine;
 
 [Serializable]

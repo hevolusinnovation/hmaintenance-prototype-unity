@@ -13,15 +13,8 @@ public enum SessionPhaseType
     End = 4
 }
 
-[Serializable]
-public struct RoomSettings
-{
-    [field:SerializeField] public string Name { get; set; }
-}
-
 public static class RoomSession
 {
-    public static RoomSettings RoomSettings {  get; private set; }
     public static Room Room { get; private set; }
     public static List<Participant> Participants { get; private set; }
 
@@ -34,8 +27,10 @@ public static class RoomSession
 
         Room = room;
         SubscribeToRoomEvents();
+        OnSessionPhaseChange?.Invoke(SessionPhaseType.Start);
         return true;
     }
+
     public static bool Dispose()
     {
         UnsubscribeToRoomEvents();
@@ -82,6 +77,7 @@ public static class RoomSession
         Debug.Log($"[RoomSession] ~ [AddPartecipant] - Remote Connected Partecipant Is Added.");
         Participants.Add(participant);
     }
+
     private static void RemovePartecipant(Participant participant)
     {
         if (participant == null)

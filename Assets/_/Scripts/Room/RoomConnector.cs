@@ -6,19 +6,46 @@ using UnityEngine;
 public class RoomConnector : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private string _token = default;
-    [Space]
     [SerializeField] private float _timeout = default;
 
+    [Header("References")]
+    [SerializeField] private TokenRequester _tokenRequester = default;
+
     private Room _room = default;
+    private UserToken _userToken = default;
 
     private WaitForSeconds _waiter = default;
 
     public Action<Room> OnRoomConnected = default;
 
+    private void Awake()
+    {
+        if(_tokenRequester != null)
+        {
+            _tokenRequester.OnUserTokenReceived += ApplyTokenToConnect;
+        }
+    }
+    private void OnDestroy()
+    {
+        if (_tokenRequester != null)
+        {
+            _tokenRequester.OnUserTokenReceived -= ApplyTokenToConnect;
+        }
+    }
     private void Start()
     {
         _waiter = new WaitForSeconds(_timeout);
+    }
+
+    private void ApplyTokenToConnect(UserToken token)
+    {
+        if(token == null)
+        {
+            return;
+        }
+
+        _userToken = token;
+        ConnectRoom();
     }
 
     [ContextMenu(nameof(CO_ConnectRoomOperation))]
@@ -31,8 +58,10 @@ public class RoomConnector : MonoBehaviour
     {
         Debug.Log($"[RoomConnector] ~ [ConnectRoomOperation] - Starting Connect Room Operation.");
 
+        RoomSession.OnSessionPhaseChange?.Invoke(SessionPhaseType.Connection);
+
         _room = new Room();
-        ConnectInstruction connectOperation = _room.Connect(APIEndpoint.LOCAL_URL, _token, new RoomOptions());
+        ConnectInstruction connectOperation = _room.Connect(APIEndpoint.LOCAL_URL, _userToken.Token, new RoomOptions());
         yield return connectOperation;
 
         if (!connectOperation.IsError)

@@ -5,7 +5,6 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
-using System.IO;
 
 namespace UnityLibrary.Runtime.Network
 {
@@ -122,6 +121,40 @@ namespace UnityLibrary.Runtime.Network
             return response;
         }
 
+        public static IEnumerator SendWebRequest(Uri uri, NetworkRequestType type, object data, Action<UnityWebRequest> responseCallback)
+        {
+            UnityWebRequest request = default;
+
+            switch (type)
+            {
+
+                case NetworkRequestType.GET:
+                    request = UnityWebRequest.Get(uri);
+                    break;
+                case NetworkRequestType.POST:
+                    request = UnityWebRequest.Post(uri, JsonUtility.ToJson(data), "application/json");
+                    break;
+                case NetworkRequestType.PUT:
+                    request = UnityWebRequest.Put(uri, JsonUtility.ToJson(data));
+                    break;
+
+            }
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError)
+            {
+                Debug.Log($"[NetworkController] - [SendWebRequest] ~ UnityWebRequest Error: {request.error}");
+                yield break;
+            }
+
+            if(request.isDone)
+            {
+                Debug.Log($"[NetworkController] - [SendWebRequest] ~ UnityWebRequest Response: {request.responseCode} - {GetNetworkServiceStatus(request.result)} - {GetNetworkServiceStatusAdvice(GetNetworkServiceStatus(request.result))}");
+                responseCallback?.Invoke(request);
+            }
+        }
+
         public static NetworkServiceStatus GetNetworkServiceStatus(UnityWebRequest.Result result)
         {
             switch (result)
@@ -160,7 +193,7 @@ namespace UnityLibrary.Runtime.Network
                 case NetworkServiceStatus.COMPLETE_UNSUCCESSFUL:
                     return "COMPLETE UNSUCCESSFUL - Server responses but something goes wrong.";
                 case NetworkServiceStatus.COMPLETE_SUCCESSFUL:
-                    return "COMPLETE SUCCESSFUL - It was not possible to reach out the server.";
+                    return "COMPLETE SUCCESSFUL - It was possible to reach out the server.";
                 default:
                     return "DEFAULT - The error encountered is not included in any foreseen case.";
             }

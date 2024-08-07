@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using Unity.VisualScripting;
 
 [System.Serializable]       
-public class RoomUserModel
+public class RoomUserAuthentication
 {
     [JsonProperty("roomName")]
     [field:Serialize] public string RoomName { get; set; }

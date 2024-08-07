@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -10,22 +9,34 @@ public class TokenRequester : MonoBehaviour
 {
 
     [Header("Settings")]
-    [SerializeField][TextArea] private string _token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjI5NzY3NjYsImlzcyI6ImRldmtleSIsIm5iZiI6MCwic3ViIjoiUGFydGljaXBhbnQ2IiwibmFtZSI6IlBhcnRpY2lwYW50NiIsInZpZGVvIjp7InJvb20iOiJUZXN0IFJvb20iLCJyb29tSm9pbiI6dHJ1ZX19.3vE-N8wtPiHOAAV1gxZxzd-93AhyU9hwyijASO2wzxs&auto_subscribe=1&sdk=js&version=2.1.5&protocol=13";
     [SerializeField] private bool _local = default;
 
     [Header("References")]
-    [SerializeField] private RoomUser _roomUser = default;
+    [SerializeField] private ClientAccessPanel _clientAccessPanel = default;
+
+    public Action<UserToken> OnUserTokenReceived = default;
+
+    private void Awake()
+    {
+        if(_clientAccessPanel != null)
+        {
+            _clientAccessPanel.OnJoinRoomAuthentication += RequestToken;
+        }
+    }
+    private void OnDestroy()
+    {
+        if (_clientAccessPanel != null)
+        {
+            _clientAccessPanel.OnJoinRoomAuthentication -= RequestToken;
+        }
+    }
 
     [ContextMenu(nameof(RequestToken))]
-    private async void RequestToken()
+    public async void RequestToken(RoomUserAuthentication roomUser)
     {
-        RoomUserModel user = new RoomUserModel();
-        user.RoomName = "HevolusRoom";
-        user.ParticipantName = _roomUser.GetParticipantName();
+        Debug.Log($"[TokenRequester] - [RequestToken] ~ Contacting Server By {roomUser.ParticipantName} In Room {roomUser.RoomName}.");
 
-        Debug.Log($"[TokenRequester] - [RequestToken] ~ Contacting Server By {user.ParticipantName} In Room {user.RoomName}.");
-
-        StringContent stringContent = APIUtility.CreateStringContent(user);
+        StringContent stringContent = APIUtility.CreateStringContent(roomUser);
         HttpResponseMessage response = await APIUtility.PostToEndpoint(stringContent, _local ? APIEndpoint.LOCAL_TOKEN_URL : APIEndpoint.LAN_TOKEN_URL);
 
         if (response == null)
@@ -49,60 +60,63 @@ public class TokenRequester : MonoBehaviour
             return;
         }
 
-        UserToken token = JsonConvert.DeserializeObject<UserToken>(content);
-        Debug.Log($"[TokenRequester] - [RequestToken] ~ Received Token Identity: {token.Token}.");
+        UserToken userToken = new UserToken() { Token = content };
+        Debug.Log($"[TokenRequester] - [RequestToken] ~ Received Token: {userToken.Token}.");
+
+        OnUserTokenReceived?.Invoke(userToken);
     }
 
     [ContextMenu(nameof(CO_RequestToken))]
-    private void CO_RequestToken()
+    public void CO_RequestToken(RoomUserAuthentication roomUser)
     {
-        RoomUserModel user = new RoomUserModel();
-        user.RoomName = "HevolusRoom";
-        user.ParticipantName = _roomUser.GetParticipantName();
+        Debug.Log($"[TokenRequester] - [RequestToken] ~ Contacting Server By {roomUser.ParticipantName} In Room {roomUser.RoomName}.");
 
-        //Dictionary<string, dynamic> userDataBody = new Dictionary<string, dynamic>();
-        //userDataBody.TryAdd("HevolusRoom", _roomUser.GetParticipantName());
-
-        Debug.Log($"[TokenRequester] - [RequestToken] ~ Contacting Server By {user.ParticipantName} In Room {user.RoomName}.");
-
-        string stringContent = APIUtility.CreateJsonContent(user);
+        string stringContent = APIUtility.CreateJsonContent(roomUser);
         NetworkRequest<string> request = NetworkController.CreateNetworkRequest(new Uri(_local ? APIEndpoint.LOCAL_TOKEN_URL : APIEndpoint.LAN_TOKEN_URL), NetworkRequestType.POST, stringContent, new KeyValuePair<string, string>(APIHeader.CONTENT_TYPE, APIHeader.APPLICATION_JSON));
 
         StartCoroutine(NetworkController.NetworkRequest(request, ResponseToken));
     }
 
+    [ContextMenu(nameof(CO_Simple_RequestToken))]
+    public void CO_Simple_RequestToken(RoomUserAuthentication roomUser)
+    {
+        Debug.Log($"[TokenRequester] - [RequestToken] ~ Contacting Server By {roomUser.ParticipantName} In Room {roomUser.RoomName}.");
+
+        StartCoroutine(NetworkController.SendWebRequest(new Uri(_local ? APIEndpoint.LOCAL_TOKEN_URL : APIEndpoint.LAN_TOKEN_URL), NetworkRequestType.POST, roomUser, ResponseToken));
+    }
+
     private void ResponseToken(UnityWebRequest request)
     {
-        NetworkResponse<UserToken> response = NetworkController.CreateNetworkResponse<UserToken>(request, false);
+        NetworkResponse<UserToken> response = NetworkController.CreateNetworkResponse<UserToken>(request, true);
 
         if (response == null)
         {
-            Debug.Log($"[TokenRequester] - [RequestToken] ~ Response is not valid.");
+            Debug.Log($"[TokenRequester] - [ResponseToken] ~ Response is not valid.");
             return;
         }
 
         if (response.Type != NetworkResponseType.SUCCESS)
         {
             NetworkServiceStatus status = NetworkController.GetNetworkServiceStatus(request.result);
-            Debug.Log($"[TokenRequester] - [RequestToken] ~ Response is not successful: {NetworkController.GetNetworkServiceStatusAdvice(status)}.");
+            Debug.Log($"[TokenRequester] - [ResponseToken] ~ Response is not successful: {NetworkController.GetNetworkServiceStatusAdvice(status)}.");
             return;
         }
 
-        Debug.Log($"[TokenRequester] - [RequestToken] ~ Response is successful.");
+        Debug.Log($"[TokenRequester] - [ResponseToken] ~ Response is successful.");
 
         if (response.Content == null)
         {
-            Debug.Log($"[TokenRequester] - [RequestToken] ~ Received Content Is Null Or Empty.");
+            Debug.Log($"[TokenRequester] - [ResponseToken] ~ Received Content Is Null Or Empty.");
             return;
         }
 
         if (string.IsNullOrEmpty(response.Content.Token))
         {
-            Debug.Log($"[TokenRequester] - [RequestToken] ~ Received Token Is Null Or Empty.");
+            Debug.Log($"[TokenRequester] - [ResponseToken] ~ Received Token Is Null Or Empty.");
             return;
         }
 
-        Debug.Log($"[TokenRequester] - [RequestToken] ~ Received Token Identity: {response.Content.Token}.");
+        Debug.Log($"[TokenRequester] - [ResponseToken] ~ Received Token Identity: {response.Content.Token}.");
     }
 
 }
