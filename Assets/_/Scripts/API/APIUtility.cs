@@ -9,6 +9,7 @@ public static class APIUtility
 {
 #pragma warning disable
     private static readonly string jsonMediaType = "application/json";
+    private static JsonSerializerSettings serializerSettings = new JsonSerializerSettings() { Culture = System.Globalization.CultureInfo.InvariantCulture };
 #pragma warning enable
 
     public static async Task<HttpResponseMessage> GetFromEndpoint(string uri)

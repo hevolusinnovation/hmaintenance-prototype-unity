@@ -13,7 +13,7 @@ public class UserToken
 {
 
     [JsonProperty("token")]
-    public string Token { get; set; }
+    [field:SerializeField] public string Token { get; set; }
 
 }
 

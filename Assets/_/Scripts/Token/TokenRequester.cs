@@ -49,8 +49,8 @@ public class TokenRequester : MonoBehaviour
             return;
         }
 
-        RoomUserToken token = JsonConvert.DeserializeObject<RoomUserToken>(content);
-        Debug.Log($"[TokenRequester] - [RequestToken] ~ Received Token Identity: {token.Identity}.");
+        UserToken token = JsonConvert.DeserializeObject<UserToken>(content);
+        Debug.Log($"[TokenRequester] - [RequestToken] ~ Received Token Identity: {token.Token}.");
     }
 
     [ContextMenu(nameof(CO_RequestToken))]
@@ -59,6 +59,9 @@ public class TokenRequester : MonoBehaviour
         RoomUserModel user = new RoomUserModel();
         user.RoomName = "HevolusRoom";
         user.ParticipantName = _roomUser.GetParticipantName();
+
+        //Dictionary<string, dynamic> userDataBody = new Dictionary<string, dynamic>();
+        //userDataBody.TryAdd("HevolusRoom", _roomUser.GetParticipantName());
 
         Debug.Log($"[TokenRequester] - [RequestToken] ~ Contacting Server By {user.ParticipantName} In Room {user.RoomName}.");
 

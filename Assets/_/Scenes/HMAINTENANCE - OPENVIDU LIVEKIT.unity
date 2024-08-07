@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9b17d528478e464898d5899bf9822cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjI5NzY3NjYsImlzcyI6ImRldmtleSIsIm5iZiI6MCwic3ViIjoiUGFydGljaXBhbnQ2IiwibmFtZSI6IlBhcnRpY2lwYW50NiIsInZpZGVvIjp7InJvb20iOiJUZXN0IFJvb20iLCJyb29tSm9pbiI6dHJ1ZX19.3vE-N8wtPiHOAAV1gxZxzd-93AhyU9hwyijASO2wzxs&auto_subscribe=1&sdk=js&version=2.1.5&protocol=13
+  _token: eyJhbGciOiJIUzI1NiJ9.eyJ2aWRlbyI6eyJyb29tSm9pbiI6dHJ1ZSwicm9vbSI6Ikhldm9sdXNSb29tIn0sImlzcyI6ImRldmtleSIsImV4cCI6MTcyMzA0MzY5OSwibmJmIjowLCJzdWIiOiJUZXN0ZXIifQ.aO9Ncgkvwl8BTLLjD2Acm_wJRYN-iBgAjzMFb525Suc
   _timeout: 3
 --- !u!4 &57409413
 Transform:
