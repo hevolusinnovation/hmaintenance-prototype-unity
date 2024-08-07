@@ -75,6 +75,7 @@ public class VideocallHandler : MonoBehaviour
     {
         // Create an IRtcEngine instance
         _rtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
+        
         RtcEngineContext context = new RtcEngineContext();
         context.appId = AgoraConf.AppID;
         context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
@@ -162,6 +163,7 @@ public class VideocallHandler : MonoBehaviour
     {
         Debug.Log("Switch camera");
         _rtcEngine.SwitchCamera();
+        
     }
 
 
