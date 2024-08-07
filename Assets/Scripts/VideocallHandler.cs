@@ -2,12 +2,13 @@ using Agora.Rtc;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Android;
 
 public class VideocallHandler : MonoBehaviour
 {
-    [SerializeField] public List<VideoSurface> remoteUsers { get; private set; } = new List<VideoSurface>();
+    [SerializeField] public List<CallFrameController> userFrames { get; private set; } = new List<CallFrameController>();
 
     [SerializeField] private VideocallsGridView _videocallsGridView;
 
@@ -21,11 +22,13 @@ public class VideocallHandler : MonoBehaviour
     private void OnEnable()
     {
         AgoraCallbackHandler.RemoteUserJoined += RemoteUserJoinedHandler;
+        AgoraCallbackHandler.RemoteUserLeft += RemoteUserLeftHandler;
 
     }
     private void OnDisable()
     {
         AgoraCallbackHandler.RemoteUserJoined -= RemoteUserJoinedHandler;
+        AgoraCallbackHandler.RemoteUserLeft -= RemoteUserLeftHandler;
 
     }
 
@@ -36,7 +39,7 @@ public class VideocallHandler : MonoBehaviour
         AgoraCallbackHandler handler = new AgoraCallbackHandler();
 
         _rtcEngine.InitEventHandler(handler);
-        
+
     }
 
     void OnApplicationQuit()
@@ -59,9 +62,9 @@ public class VideocallHandler : MonoBehaviour
         _rtcEngine.DisableVideo();
         // Stop remote video rendering
 
-        foreach(var userVideo in remoteUsers)
+        foreach (var userFrame in userFrames)
         {
-            userVideo.SetEnable(false);
+            userFrame.Destroy();
         }
 
         // Stop local video rendering
@@ -79,6 +82,7 @@ public class VideocallHandler : MonoBehaviour
         // Initialize the instance
         _rtcEngine.Initialize(context);
     }
+
     public void Join()
     {
         if (_videocallsGridView == null)
@@ -87,41 +91,30 @@ public class VideocallHandler : MonoBehaviour
             return;
         }
 
-        GameObject localFrameView = _videocallsGridView.GetLocalFrame();
+        CallFrameController localFrameView = _videocallsGridView.GetLocalFrame();
         ChannelMediaOptions options = new ChannelMediaOptions();
 
         Debug.Log("Try join...");
         try
         {
             _rtcEngine.EnableVideo();
-            if (localFrameView.TryGetComponent(out VideoSurface videoSurface))
-            {
-                //localFrameView.transform.Rotate(0.0f, 0.0f, -180.0f);
+            localFrameView.SetFrame(0, "");
+            localFrameView.SetEnable(true);
+            options.autoSubscribeAudio.SetValue(true);
+            options.autoSubscribeVideo.SetValue(true);
+            options.channelProfile.SetValue(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_COMMUNICATION);
+            options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            _rtcEngine.JoinChannel(AgoraConf.Token, AgoraConf.ChannelName, 0, options);
 
-                videoSurface.SetForUser(0, "");
-                videoSurface.SetEnable(true);
-                options.autoSubscribeAudio.SetValue(true);
-                options.autoSubscribeVideo.SetValue(true);
-                options.channelProfile.SetValue(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_COMMUNICATION);
-                options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-                _rtcEngine.JoinChannel(AgoraConf.Token, AgoraConf.ChannelName, 0, options);
-
-                Debug.Log($"Local user joined");
-
-            }
-            else
-            {
-                Debug.LogError("Video surface component not found");
-            }
+            Debug.Log($"Local user joined");
         }
-        catch(Exception e) 
+        catch (Exception e)
         {
             Debug.LogError("Error during user join:" + e.Message, this);
-            
         }
 
     }
-    
+
     private void RemoteUserJoinedHandler(UserCallbackEventArgs eventArgs)
     {
         Debug.Log("Remote user try join..", this);
@@ -131,24 +124,76 @@ public class VideocallHandler : MonoBehaviour
             return;
         }
 
-        GameObject frameView = _videocallsGridView.AddRemoteFrame();
-        if (frameView == null)
+        CallFrameController frame = _videocallsGridView.CreateFrame();
+        if (frame == null)
         {
             Debug.LogError("Error during frame view instantiation");
             return;
         }
 
-        if (frameView.TryGetComponent(out VideoSurface videoSurface))
-        {
-            videoSurface.SetForUser(eventArgs.uid, eventArgs.connection.channelId, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
-            videoSurface.SetEnable(true);
-            remoteUsers.Add(videoSurface);
-            Debug.Log($"Remote user with id:{eventArgs.uid} joined");
-        }
-        else
-        {
-            Debug.LogError("Video surface component not found");
-        }
+        frame.SetFrame(eventArgs.uid, eventArgs.connection.channelId, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
+        frame.SetEnable(true);
+        userFrames.Add(frame);
+        Debug.Log($"Remote user with id:{eventArgs.uid} joined");
     }
-    
+
+    private void RemoteUserLeftHandler(UserCallbackEventArgs eventArgs)
+    {
+        Debug.Log($"Remote user with id:{eventArgs.uid} left", this);
+        if (_videocallsGridView == null)
+        {
+            Debug.LogError("Videocalls grid view not found, please assign it in inspector");
+            return;
+        }
+
+        CallFrameController frame = userFrames.Where(f => f.id == eventArgs.uid).FirstOrDefault();
+        if (frame == null)
+        {
+            Debug.LogError($"Error during frame retrieving id:{eventArgs.uid}", this);
+            return;
+        }
+
+        userFrames.Remove(frame);
+        frame.Destroy();
+        Debug.Log($"Remote user with id:{eventArgs.uid} removed");
+    }
+
+    public void SwitchCamera()
+    {
+        Debug.Log("Switch camera");
+        _rtcEngine.SwitchCamera();
+    }
+
+
+    public void StartScreenSharing()
+    {
+        ScreenCaptureParameters2 screenCaptureParameters2 = new ScreenCaptureParameters2();
+        screenCaptureParameters2.captureVideo = true;
+        screenCaptureParameters2.captureAudio = true;
+        screenCaptureParameters2.videoParams.dimensions = new VideoDimensions();
+
+        // Enable screen sharing.
+        _rtcEngine.StartScreenCapture(screenCaptureParameters2);
+        ChannelMediaOptions channelMediaOptions = new ChannelMediaOptions();
+        channelMediaOptions.publishScreenCaptureVideo.SetValue(true);
+        channelMediaOptions.publishScreenCaptureAudio.SetValue(true);
+        channelMediaOptions.publishCameraTrack.SetValue(false);
+        channelMediaOptions.publishMicrophoneTrack.SetValue(false);
+        // Update channel media options.
+        _rtcEngine.UpdateChannelMediaOptions(channelMediaOptions);
+    }
+
+    public void StopScreenCapture()
+    {
+
+        _rtcEngine.StopScreenCapture();
+        //ChannelMediaOptions channelMediaOptions = new ChannelMediaOptions();
+        //channelMediaOptions.publishScreenCaptureVideo.SetValue(true);
+        //channelMediaOptions.publishScreenCaptureAudio.SetValue(true);
+        //channelMediaOptions.publishCameraTrack.SetValue(false);
+        //channelMediaOptions.publishMicrophoneTrack.SetValue(false);
+        //// Update channel media options.
+        //_rtcEngine.UpdateChannelMediaOptions(channelMediaOptions);
+    }
+
 }

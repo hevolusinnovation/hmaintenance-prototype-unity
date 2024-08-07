@@ -10,7 +10,7 @@ public class VideocallsGridView : MonoBehaviour
 {
     [SerializeField] private GridLayoutGroup _gridLayoutGroup;
 
-    [SerializeField] private GameObject _localFrame;
+    [SerializeField] private CallFrameController _localFrame;
     [SerializeField] private GameObject _framePrefab;
 
     private void OnValidate()
@@ -26,7 +26,8 @@ public class VideocallsGridView : MonoBehaviour
             Debug.LogError("frame prefab is null, please assign it in inspector", this);           
         }
     }
-    public GameObject GetLocalFrame()
+
+    public CallFrameController GetLocalFrame()
     {
         if (_localFrame == null)
         {
@@ -37,13 +38,31 @@ public class VideocallsGridView : MonoBehaviour
         return _localFrame;
     }
     
-    public GameObject AddRemoteFrame()
+    public CallFrameController CreateFrame()
     {
         if (_framePrefab == null)
         {
             return null;
         }
 
-        return Instantiate(_framePrefab, this.transform);
+        var frame = Instantiate(_framePrefab, this.transform);
+
+        if (frame.TryGetComponent(out CallFrameController frameController))
+        {
+            return frameController;
+        }
+        else
+        {
+            Debug.LogError("frame controller component not found", this);
+            return null;
+        }
+
+    }
+
+    public void RemoveFrame(uint id)
+    {
+        
+
+        
     }
 }

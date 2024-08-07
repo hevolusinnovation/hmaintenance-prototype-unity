@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5745594536532194889}
   - component: {fileID: 7832664986425841689}
   - component: {fileID: 8972107108621811014}
+  - component: {fileID: -5544301513253416742}
   - component: {fileID: -2515233736863712150}
   m_Layer: 5
   m_Name: RemoteFrameView
@@ -73,6 +74,19 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
+--- !u!114 &-5544301513253416742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7602944268302514225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d36298dbf9460df458b535a740c12f8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  videoSurface: {fileID: -2515233736863712150}
 --- !u!114 &-2515233736863712150
 MonoBehaviour:
   m_ObjectHideFlags: 0
