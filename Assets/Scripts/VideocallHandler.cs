@@ -103,8 +103,11 @@ public class VideocallHandler : MonoBehaviour
             localFrameView.SetEnable(true);
             options.autoSubscribeAudio.SetValue(true);
             options.autoSubscribeVideo.SetValue(true);
+            
             options.channelProfile.SetValue(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_COMMUNICATION);
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            SetVideoEncoderConfiguration();
+
             _rtcEngine.JoinChannel(AgoraConf.Token, AgoraConf.ChannelName, 0, options);
 
             Debug.Log($"Local user joined");
@@ -114,6 +117,19 @@ public class VideocallHandler : MonoBehaviour
             Debug.LogError("Error during user join:" + e.Message, this);
         }
 
+    }
+
+    private void SetVideoEncoderConfiguration()
+    {
+        VideoEncoderConfiguration config = new VideoEncoderConfiguration
+        {
+            dimensions = new VideoDimensions(640, 360), // Risoluzione 640x360
+            frameRate = 10, // Frame rate 10 fps
+            bitrate = 400, // Bitrate 400 Kbps
+            orientationMode = ORIENTATION_MODE.ORIENTATION_MODE_ADAPTIVE
+        };
+
+        _rtcEngine.SetVideoEncoderConfiguration(config);
     }
 
     private void RemoteUserJoinedHandler(UserCallbackEventArgs eventArgs)
@@ -172,7 +188,6 @@ public class VideocallHandler : MonoBehaviour
         ScreenCaptureParameters2 screenCaptureParameters2 = new ScreenCaptureParameters2();
         screenCaptureParameters2.captureVideo = true;
         screenCaptureParameters2.captureAudio = true;
-        screenCaptureParameters2.videoParams.dimensions = new VideoDimensions();
 
         // Enable screen sharing.
         _rtcEngine.StartScreenCapture(screenCaptureParameters2);

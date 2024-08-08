@@ -314,7 +314,7 @@ MonoBehaviour:
   m_ChildAlignment: 6
   m_StartCorner: 2
   m_StartAxis: 1
-  m_CellSize: {x: 340, y: 480}
+  m_CellSize: {x: 360, y: 640}
   m_Spacing: {x: 10, y: 10}
   m_Constraint: 1
   m_ConstraintCount: 3
@@ -1144,6 +1144,7 @@ GameObject:
   - component: {fileID: 1012898217}
   - component: {fileID: 1012898216}
   - component: {fileID: 1012898215}
+  - component: {fileID: 1012898218}
   m_Layer: 0
   m_Name: AR Session
   m_TagString: Untagged
@@ -1193,6 +1194,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1012898218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1012898214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 101604f066dc5384fbe13355629a2ab7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 7197998923353983242, guid: a1eac3cbd79411a43a9e5165c278790c, type: 3}
+  raycastManager: {fileID: 0}
 --- !u!1 &1112929151
 GameObject:
   m_ObjectHideFlags: 0
@@ -2037,6 +2052,7 @@ GameObject:
   - component: {fileID: 1751735365}
   - component: {fileID: 1751735367}
   - component: {fileID: 1751735366}
+  - component: {fileID: 1751735368}
   m_Layer: 0
   m_Name: Agora
   m_TagString: Untagged
@@ -2082,6 +2098,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 83471f392b6ffdb49b79e7a4c0552334, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1751735368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1751735363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac6f311f890406b4fbf8ddca004e0262, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1974140302
