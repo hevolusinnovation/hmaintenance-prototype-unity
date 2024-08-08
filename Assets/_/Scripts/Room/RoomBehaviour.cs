@@ -13,24 +13,24 @@ public struct RoomBehaviourSettings
 
 public abstract class RoomBehaviour : MonoBehaviour
 {
-    [Header("Settings")]
-    [SerializeField] protected RoomBehaviourSettings _behaviourSettings = default;
+    [Header("Behaviour Settings")]
+    [SerializeField] protected RoomBehaviourSettings _settings = default;
 
     protected virtual void Awake()
     {
-        RoomSession.OnSessionPhaseChange += SessionPhase;
+        RoomSession.AddBehaviour(this);
     }
     protected virtual void OnDestroy()
     {
-        RoomSession.OnSessionPhaseChange -= SessionPhase;
+        RoomSession.RemoveBehaviour(this);
     }
 
-    protected void SessionPhase(SessionPhaseType phase)
+    public void SessionPhase(SessionPhaseType phase)
     {
-        if (_behaviourSettings.HasInizialization(phase))
+        if (_settings.HasInizialization(phase))
             Inizialize();
 
-        if (_behaviourSettings.HasDisposal(phase))
+        if (_settings.HasDisposal(phase))
             Dispose();
     }
 

@@ -1,4 +1,5 @@
 using LiveKit;
+using TMPro;
 using UnityEngine;
 
 public class RoomUser : RoomBehaviour
@@ -10,11 +11,17 @@ public class RoomUser : RoomBehaviour
     [SerializeField] private bool _isMicrophoneEnabled = default;
     [SerializeField] private bool _isScreenShareEnabled = default;
 
+    [Header("References")]
+    [SerializeField] private TextMeshProUGUI _userNameText = default;
+
     private LocalParticipant _localParticipant = default;
 
     protected override void Inizialize()
     {
+
         _localParticipant = RoomSession.Room.LocalParticipant;
+        _userNameText.text = _localParticipant.Name;
+
     }
     protected override void Dispose()
     {

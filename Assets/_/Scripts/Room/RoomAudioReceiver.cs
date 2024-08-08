@@ -8,18 +8,25 @@ public class RoomAudioReceiver : RoomBehaviour
 
     protected override void Inizialize()
     {
-    //    RoomSession.Room.TrackSubscribed += ReceiveAudioData;
+        RoomSession.Room.TrackSubscribed += TrackSubscribed;
     }
     protected override void Dispose()
     {
-    //    RoomSession.Room.TrackSubscribed -= ReceiveAudioData;
+        RoomSession.Room.TrackSubscribed -= TrackSubscribed;
     }
 
-    //private void ReceiveAudioData(RemoteTrack track, RemoteTrackPublication publication, RemoteParticipant participant)
-    //{
-    //    if (track.Kind == TrackKind.Audio)
-    //    {
-    //        HTMLAudioElement audio = track.Attach() as HTMLAudioElement;
-    //    }
-    //}
+    void TrackSubscribed(IRemoteTrack track, RemoteTrackPublication publication, RemoteParticipant participant)
+    {
+
+        if (track is RemoteAudioTrack audioTrack)
+        {
+            Debug.Log($"[RoomAudioReceiver] - [TrackSubscribed] - ");
+
+            GameObject audObject = new GameObject(audioTrack.Sid);
+            AudioStream stream = new AudioStream(audioTrack, _audioSource);
+        }
+
+
+    }
+
 }

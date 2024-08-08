@@ -20,7 +20,7 @@ public class RoomConnector : MonoBehaviour
 
     private void Awake()
     {
-        if(_tokenRequester != null)
+        if (_tokenRequester != null)
         {
             _tokenRequester.OnUserTokenReceived += ApplyTokenToConnect;
         }
@@ -39,7 +39,7 @@ public class RoomConnector : MonoBehaviour
 
     private void ApplyTokenToConnect(UserToken token)
     {
-        if(token == null)
+        if (token == null)
         {
             return;
         }
@@ -58,7 +58,7 @@ public class RoomConnector : MonoBehaviour
     {
         Debug.Log($"[RoomConnector] ~ [ConnectRoomOperation] - Starting Connect Room Operation.");
 
-        RoomSession.OnSessionPhaseChange?.Invoke(SessionPhaseType.Connection);
+        RoomSession.TryAskSessionChange(SessionPhaseType.Connection);
 
         _room = new Room();
         ConnectInstruction connectOperation = _room.Connect(APIEndpoint.LOCAL_URL, _userToken.Token, new RoomOptions());
@@ -76,9 +76,11 @@ public class RoomConnector : MonoBehaviour
         if (connectOperation.IsDone)
         {
             Debug.Log($"[RoomConnector] ~ [ConnectRoomOperation] - Connect Room Operation Is Complete.");
-            RoomSession.Initialize(_room);
-            OnRoomConnected?.Invoke(_room);
-            yield break;
+            if (RoomSession.Initialize(_room))
+            {
+                OnRoomConnected?.Invoke(_room);
+                yield break;
+            }
         }
 
         Debug.Log($"[RoomConnector] ~ [ConnectRoomOperation] - Connect Room Operation Failed: {connectOperation}.");

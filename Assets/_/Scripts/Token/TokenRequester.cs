@@ -20,14 +20,14 @@ public class TokenRequester : MonoBehaviour
     {
         if(_clientAccessPanel != null)
         {
-            _clientAccessPanel.OnJoinRoomAuthentication += RequestToken;
+            _clientAccessPanel.OnTryJoinRoomRequest += RequestToken;
         }
     }
     private void OnDestroy()
     {
         if (_clientAccessPanel != null)
         {
-            _clientAccessPanel.OnJoinRoomAuthentication -= RequestToken;
+            _clientAccessPanel.OnTryJoinRoomRequest -= RequestToken;
         }
     }
 

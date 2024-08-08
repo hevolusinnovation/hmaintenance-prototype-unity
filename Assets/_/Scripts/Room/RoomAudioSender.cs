@@ -1,4 +1,5 @@
 using LiveKit;
+using LiveKit.Proto;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +12,11 @@ public class RoomAudioSender : RoomBehaviour
 
     [Header("References")]
     [SerializeField] private string _microphone = default;
-    [Space]
     [SerializeField] private List<string> _microphoneDevices = default;
     [Space]
-    [SerializeField] private RoomUser _user = default;
+    [SerializeField] private AudioSource _audioSource = default;
 
-    //private Queue<LocalTrack> _encodedTracks = new Queue<LocalTrack>();
+    private RoomUser _user = default;
 
     protected override void Inizialize()
     {
@@ -24,43 +24,36 @@ public class RoomAudioSender : RoomBehaviour
     }
     protected override void Dispose()
     {
+
     }
 
-    //private void Update()
-    //{
-    //    if (_user.GetLocalParticipant() != null && _user.GetLocalParticipant().IsSpeaking)
-    //    {
-    //        _user.GetLocalParticipant().CreateTracks();
-    //    }
-    //}
+    private IEnumerator SendData()
+    {
 
-    //private void SendData(LocalTrack localTrack)
-    //{
-    //    StartCoroutine(CO_SendData(localTrack));
-    //}
-    //private IEnumerator CO_SendData(LocalTrack localTrack)
-    //{
-    //    JSPromise<LocalTrackPublication> promise = _user.GetLocalParticipant().PublishTrack(localTrack);
-    //    yield return promise;
+        var localSid = "my-audio-source";
+        GameObject audObject = new GameObject(localSid);
+        _audioSource.clip = Microphone.Start(_microphone, true, 2, (int)RtcAudioSource.DefaultSampleRate);
+        _audioSource.loop = true;
 
-    //    if (promise.IsError)
-    //    {
-    //        Debug.Log($"[RoomAudioSender] - [CO_SendData] ~ Publishing AudioData Operation Ends With Error.");
+        RtcAudioSource rtcSource = new RtcAudioSource(_audioSource);
+        LocalAudioTrack track = LocalAudioTrack.CreateAudioTrack("my-audio-track", rtcSource, RoomSession.Room);
 
-    //        if (_retryOnError)
-    //        {
-    //            yield return CO_SendData(localTrack);
+        var options = new TrackPublishOptions();
+        options.AudioEncoding = new AudioEncoding();
+        options.AudioEncoding.MaxBitrate = 64000;
+        options.Source = TrackSource.SourceMicrophone;
 
-    //            Debug.Log($"[RoomAudioSender] - [CO_SendData] ~ Retry Attemp To Publishing AudioData Operation Ends Correctly.");
-    //            yield break;
-    //        }
+        var publish = _user.GetLocalParticipant().PublishTrack(track, options);
+        yield return publish;
 
-    //        yield break;
-    //    }
+        if (publish.IsError)
+        {
+            Debug.Log("Track is not published!");
+            yield break;
+        }
 
-    //    if (promise.IsDone)
-    //    {
-    //        Debug.Log($"[RoomAudioSender] - [CO_SendData] ~ Publishing AudioData Operation Ends Correctly.");
-    //    }
-    //}
+        rtcSource.Start();
+
+    }
+
 }
