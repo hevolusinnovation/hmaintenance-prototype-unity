@@ -10,6 +10,6 @@ public static class APIEndpoint
     public const string LAN_TOKEN_URL = LAN_URL + "/token";
 
     //LIVEKIT
-    public const string LIVEKIT_URL = "http://localhost:7880";
+    public const string LIVEKIT_URL = /*"http://localhost:7880"*/ "ws://localhost:7880";
 
 }
