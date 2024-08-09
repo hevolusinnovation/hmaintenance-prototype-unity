@@ -27,11 +27,19 @@ public abstract class RoomBehaviour : MonoBehaviour
 
     public void SessionPhase(SessionPhaseType phase)
     {
+        Debug.Log($"[RoomBehaviour] - [SessionPhase] ~ {GetType().Name} Behaviour Session Phase Sync: {phase}.");
+
         if (_settings.HasInizialization(phase))
+        {
+            Debug.Log($"[RoomBehaviour] - [SessionPhase] ~ {GetType().Name} Initialization.");
             Inizialize();
+        }
 
         if (_settings.HasDisposal(phase))
+        {
+            Debug.Log($"[RoomBehaviour] - [SessionPhase] ~ {GetType().Name} Disposal.");
             Dispose();
+        }
     }
 
     protected abstract void Inizialize();

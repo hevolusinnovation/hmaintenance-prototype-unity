@@ -58,7 +58,8 @@ public class RoomConnector : MonoBehaviour
     {
         Debug.Log($"[RoomConnector] ~ [ConnectRoomOperation] - Starting Connect Room Operation.");
 
-        RoomSession.TryAskSessionChange(SessionPhaseType.Connection);
+        RoomSession.TryAskSessionChange(SessionPhaseType.ConnectionStarted);
+        yield return _waiter;
 
         _room = new Room();
         ConnectInstruction connectOperation = _room.Connect(APIEndpoint.LOCAL_URL, _userToken.Token, new RoomOptions());
@@ -70,12 +71,16 @@ public class RoomConnector : MonoBehaviour
         }
         else
         {
-            Debug.Log($"[RoomConnector] ~ [ConnectRoomOperation] - Connecting To Room: {connectOperation.IsDone}.");
+            Debug.Log($"[RoomConnector] ~ [ConnectRoomOperation] - Connecting To Room Error: {connectOperation.IsError}.");
         }
 
-        if (connectOperation.IsDone)
+        if (!connectOperation.IsError && connectOperation.IsDone)
         {
             Debug.Log($"[RoomConnector] ~ [ConnectRoomOperation] - Connect Room Operation Is Complete.");
+
+            RoomSession.TryAskSessionChange(SessionPhaseType.ConnectionCompleted);
+            yield return _waiter;
+
             if (RoomSession.Initialize(_room))
             {
                 OnRoomConnected?.Invoke(_room);
@@ -84,7 +89,11 @@ public class RoomConnector : MonoBehaviour
         }
 
         Debug.Log($"[RoomConnector] ~ [ConnectRoomOperation] - Connect Room Operation Failed: {connectOperation}.");
+        RoomSession.TryAskSessionChange(SessionPhaseType.ConnectionError);
+        yield return _waiter;
+
         Debug.Log($"[RoomConnector] ~ [ConnectRoomOperation] - Retrying Connect Room Operation In {_timeout} Seconds.");
+        RoomSession.TryAskSessionChange(SessionPhaseType.ConnectionRetry);
         yield return _waiter;
 
         yield return CO_ConnectRoomOperation();

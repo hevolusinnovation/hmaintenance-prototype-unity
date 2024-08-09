@@ -40,9 +40,13 @@ public class RoomDataSender : RoomBehaviour
 
     public void SendData(byte[] data)
     {
+        if (!_user.TryGetLocalParticipant(out var participant))
+        {
+            Debug.Log($"[RoomDataSender] - [SendData] ~ Local Participant Was Not Found.");
+            return;
+        }
 
-        _user.GetLocalParticipant().PublishData(data);
-
+        participant.PublishData(data);
     }
 
 }

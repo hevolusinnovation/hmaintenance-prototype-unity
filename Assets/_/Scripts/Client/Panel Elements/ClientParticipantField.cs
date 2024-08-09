@@ -1,3 +1,4 @@
+using LiveKit;
 using UnityEngine;
 
 public class ClientParticipantField : ClientPanel
@@ -17,5 +18,8 @@ public class ClientParticipantField : ClientPanel
     [SerializeField] private RoomAudioSender _roomAudioSender = default;
     [SerializeField] private RoomAudioReceiver _roomAudioReceiver = default;
 
-
+    public void SetupRemoteParticipantInfo(Participant participant)
+    {
+        _roomUser.AssignParticipant(participant);
+    }
 }

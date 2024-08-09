@@ -23,7 +23,6 @@ public class RoomVideoSender : RoomBehaviour
 
     protected override void Inizialize()
     {
-
         _webcamTexture = new WebCamTexture();
         _webcamDevices = WebCamTexture.devices.ToList();
 
@@ -34,6 +33,10 @@ public class RoomVideoSender : RoomBehaviour
             Debug.Log($"[RoomVideoSender] ~ [Inizialize] - Device N.{_webcamDevices.IndexOf(device)} Is {device.name}.");
         }
 
+        if(_webcamDevices.Count > 0)
+        {
+            SelectDevice();
+        }
     }
     protected override void Dispose()
     {
@@ -43,9 +46,9 @@ public class RoomVideoSender : RoomBehaviour
     
     }
 
-    private void SelectDevice(int index)
+    [ContextMenu(nameof(SelectDevice))]
+    public void SelectDevice(int index = 0)
     {
-
         if (index >= _webcamDevices.Count)
         {
             Debug.Log($"[RoomVideSender] - [SelectDevice] ~ Error Selecting Webcam Device At Index {index}.");
@@ -83,7 +86,13 @@ public class RoomVideoSender : RoomBehaviour
         options.Simulcast = true;
         options.Source = TrackSource.SourceCamera;
 
-        var publish = _user.GetLocalParticipant().PublishTrack(track, options);
+        if (!_user.TryGetLocalParticipant(out var participant))
+        {
+            Debug.Log($"[RoomDataSender] - [SendData] ~ Local Participant Was Not Found.");
+            yield break;
+        }
+
+        PublishTrackInstruction publish = participant.PublishTrack(track, options);
         yield return publish;
 
         if (!publish.IsError)

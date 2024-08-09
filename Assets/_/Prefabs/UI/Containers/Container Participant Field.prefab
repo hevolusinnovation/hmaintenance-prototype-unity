@@ -162,8 +162,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _settings:
-    _initializationPhase: 2
-    _disposalPhase: 4
+    _initializationPhase: 32
+    _disposalPhase: 192
   _retryOnError: 0
   _microphone: 
   _microphoneDevices: []
@@ -181,8 +181,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _settings:
-    _initializationPhase: 2
-    _disposalPhase: 4
+    _initializationPhase: 32
+    _disposalPhase: 192
   _audioSource: {fileID: 8105385111634879129}
 --- !u!1 &4424275971979098229
 GameObject:
@@ -270,8 +270,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _settings:
-    _initializationPhase: 2
-    _disposalPhase: 4
+    _initializationPhase: 32
+    _disposalPhase: 192
 --- !u!114 &1614157259216361639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -285,8 +285,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _settings:
-    _initializationPhase: 2
-    _disposalPhase: 4
+    _initializationPhase: 32
+    _disposalPhase: 192
 --- !u!1 &4851320437651171745
 GameObject:
   m_ObjectHideFlags: 0
@@ -374,10 +374,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _settings:
-    _initializationPhase: 2
-    _disposalPhase: 4
+    _initializationPhase: 32
+    _disposalPhase: 192
   _requestedFPS: 30
-  _textureSize: {x: 0, y: 0}
+  _textureSize: {x: 200, y: 216}
   _rawImage: {fileID: 5153492468569434747}
 --- !u!114 &3084342075920230705
 MonoBehaviour:
@@ -392,8 +392,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _settings:
-    _initializationPhase: 2
-    _disposalPhase: 4
+    _initializationPhase: 32
+    _disposalPhase: 192
   _rawImage: {fileID: 5153492468569434747}
 --- !u!1 &5148361885604717716
 GameObject:
@@ -907,6 +907,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc907173a4097814dbc07f51e8765e7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _enablingPhase: 0
   _isLocal: 0
   _roomUser: {fileID: 6734238478335675170}
   _roomDataSender: {fileID: 0}
@@ -928,8 +929,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _settings:
-    _initializationPhase: 2
-    _disposalPhase: 4
+    _initializationPhase: 32
+    _disposalPhase: 192
   _name: 
   _isCameraEnabled: 0
   _isMicrophoneEnabled: 0

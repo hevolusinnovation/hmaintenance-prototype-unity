@@ -1004,11 +1004,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 598d0d19eb09ed5499831f06bdc1dbd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _enablingPhase: 1
   _roomNameInputField: {fileID: 6142830218257142805}
   _participantNameInputField: {fileID: 747861173345448220}
   _joinRoomButton: {fileID: 5350531105048111368}
-  _roomSettings: {fileID: 0}
-  _roomUser: {fileID: 0}
 --- !u!1 &3779349406048177698
 GameObject:
   m_ObjectHideFlags: 0

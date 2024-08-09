@@ -8,16 +8,21 @@ using UnityEngine;
 public enum SessionPhaseType
 {
     None = 0,
-    Connection = 1,
-    Start = 2,
-    End = 4
+    Home = 1,
+    ConnectionStarted = 2,
+    ConnectionCompleted = 4,
+    ConnectionError = 8,
+    ConnectionRetry = 16,
+    Start = 32,
+    End = 64,
+    Error = 128
 }
 
 public static class RoomSession
 {
     public static Room Room { get; private set; }
-    public static List<Participant> Participants { get; private set; }
-    public static List<RoomBehaviour> RoomBehaviours { get; private set; }
+    public static List<Participant> Participants { get; private set; } = new List<Participant>();
+    public static List<RoomBehaviour> RoomBehaviours { get; private set; } = new List<RoomBehaviour>();
 
     public static Action<SessionPhaseType> OnSessionPhaseChange = default;
 
@@ -26,14 +31,16 @@ public static class RoomSession
     #region Session
     public static bool TryAskSessionChange(SessionPhaseType type)
     {
-        if(_currentSessionPhase == type)
+        if (_currentSessionPhase == type)
         {
-            Debug.Log($"[RoomSession] ~ [TryCommunicateSession] - Session is already in phase {type}.");
+            Debug.Log($"[RoomSession] ~ [TryAskSessionChange] - Session Is Already In Phase {type}.");
             return false;
         }
 
+        Debug.Log($"[RoomSession] ~ [TryAskSessionChange] - Moving To Session Phase {type}.");
         _currentSessionPhase = type;
         OnSessionPhaseChange?.Invoke(type);
+        SyncSession();
         return true;
     }
     #endregion
@@ -46,7 +53,7 @@ public static class RoomSession
 
         Room = room;
         SubscribeToRoomEvents();
-        OnSessionPhaseChange?.Invoke(SessionPhaseType.Start);
+        TryAskSessionChange(SessionPhaseType.Start);
         return true;
     }
 
@@ -119,47 +126,60 @@ public static class RoomSession
     #endregion
 
     #region Behaviour
-    public static void AddBehaviour(RoomBehaviour behaviour)
+    public static void AddBehaviour(RoomBehaviour behaviour, bool update = false)
     {
         if (behaviour == null)
         {
-            Debug.Log($"[RoomSession] ~ [AddBehaviour] - Remote Connected Behaviour Is Not Valid.");
+            Debug.Log($"[RoomSession] ~ [AddBehaviour] - Room Connected Behaviour {behaviour.GetType().Name} Is Not Valid.");
             return;
         }
 
         if (RoomBehaviours.Contains(behaviour))
         {
-            Debug.Log($"[RoomSession] ~ [AddBehaviour] - Remote Connected Behaviour Is Already Present.");
-            SyncSession(behaviour);
+            Debug.Log($"[RoomSession] ~ [AddBehaviour] - Room Connected Behaviour {behaviour.GetType().Name} Is Already Present.");
+
+            if (update)
+            {
+                SyncSession(behaviour);
+            }
             return;
         }
 
-        Debug.Log($"[RoomSession] ~ [AddBehaviour] - Remote Connected Behaviour Is Added.");
+        Debug.Log($"[RoomSession] ~ [AddBehaviour] - Room Connected Behaviour {behaviour.GetType().Name} Is Added.");
         RoomBehaviours.Add(behaviour);
-        SyncSession(behaviour);
     }
     public static void RemoveBehaviour(RoomBehaviour behaviour)
     {
         if (behaviour == null)
         {
-            Debug.Log($"[RoomSession] ~ [RemoveBehaviour] - Remote Connected Behaviour Is Not Valid.");
+            Debug.Log($"[RoomSession] ~ [RemoveBehaviour] - Remote Connected Behaviour {behaviour.GetType().Name} Is Not Valid.");
             return;
         }
 
         if (!RoomBehaviours.Contains(behaviour))
         {
-            Debug.Log($"[RoomSession] ~ [RemoveBehaviour] - Remote Connected Behaviour Is Not Present.");
+            Debug.Log($"[RoomSession] ~ [RemoveBehaviour] - Remote Connected Behaviour {behaviour.GetType().Name} Is Not Present.");
             return;
         }
 
-        Debug.Log($"[RoomSession] ~ [RemoveBehaviour] - Remote Connected Behaviour Is Removed.");
+        Debug.Log($"[RoomSession] ~ [RemoveBehaviour] - Remote Connected Behaviour {behaviour.GetType().Name} Is Removed.");
         RoomBehaviours.Remove(behaviour);
     }
-    private static void SyncSession(RoomBehaviour behaviour)
+    public static void SyncSession()
+    {
+        if (RoomBehaviours.Count <= 0)
+        {
+            Debug.Log($"[RoomSession] ~ [AddBehaviour] - Room Behaviours To Sync Not Registered.");
+            return;
+        }
+
+        RoomBehaviours.ForEach(behaviour => SyncSession(behaviour));
+    }
+    public static void SyncSession(RoomBehaviour behaviour)
     {
         if (behaviour == null)
         {
-            Debug.Log($"[RoomSession] ~ [AddBehaviour] - Room Behaviour Is Not Valid.");
+            Debug.Log($"[RoomSession] ~ [AddBehaviour] - Room Behaviour {behaviour.GetType().Name} Is Not Valid.");
             return;
         }
 

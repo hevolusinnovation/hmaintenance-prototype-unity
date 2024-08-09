@@ -29,7 +29,6 @@ public class RoomAudioSender : RoomBehaviour
 
     private IEnumerator SendData()
     {
-
         var localSid = "my-audio-source";
         GameObject audObject = new GameObject(localSid);
         _audioSource.clip = Microphone.Start(_microphone, true, 2, (int)RtcAudioSource.DefaultSampleRate);
@@ -43,7 +42,13 @@ public class RoomAudioSender : RoomBehaviour
         options.AudioEncoding.MaxBitrate = 64000;
         options.Source = TrackSource.SourceMicrophone;
 
-        var publish = _user.GetLocalParticipant().PublishTrack(track, options);
+        if(!_user.TryGetLocalParticipant(out var participant))
+        {
+            Debug.Log($"[RoomAudioSender] - [SendData] ~ Local Participant Was Not Found." );
+            yield break;
+        }
+
+        PublishTrackInstruction publish = participant.PublishTrack(track, options);
         yield return publish;
 
         if (publish.IsError)
@@ -53,7 +58,6 @@ public class RoomAudioSender : RoomBehaviour
         }
 
         rtcSource.Start();
-
     }
 
 }
