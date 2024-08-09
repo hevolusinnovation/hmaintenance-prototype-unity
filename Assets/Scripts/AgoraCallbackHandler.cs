@@ -16,10 +16,14 @@ public struct UserCallbackEventArgs
 public class AgoraCallbackHandler : IRtcEngineEventHandler
 {
 
-    public static event Action<UserCallbackEventArgs> RemoteUserJoined;
-    public static event Action<UserCallbackEventArgs> RemoteUserLeft;
+    public static event Action<UserCallbackEventArgs> OnRemoteUserJoined;
+    public static event Action<UserCallbackEventArgs> OnRemoteUserLeft;
 
-    public static event Action<UserCallbackEventArgs> LocalUserJoined;
+    public static event Action<UserCallbackEventArgs> OnLocalUserJoined;
+
+    public static event Action<LocalVideoStats> OnLocalVideoStatsEvent;
+    public static event Action<RemoteVideoStats> OnRemoteVideoStatsEvent;
+
     public static event Action localUserLeft;
 
     public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
@@ -34,7 +38,7 @@ public class AgoraCallbackHandler : IRtcEngineEventHandler
             elapsed = elapsed,
         };
 
-        RemoteUserJoined?.Invoke(userArgs); 
+        OnRemoteUserJoined?.Invoke(userArgs); 
 
        
     }
@@ -50,7 +54,7 @@ public class AgoraCallbackHandler : IRtcEngineEventHandler
             elapsed = elapsed,
         };
 
-        LocalUserJoined?.Invoke(userArgs);
+        OnLocalUserJoined?.Invoke(userArgs);
         
     }
 
@@ -67,7 +71,29 @@ public class AgoraCallbackHandler : IRtcEngineEventHandler
             reason = reason,
         };
 
-        RemoteUserLeft?.Invoke(userArgs);
+        OnRemoteUserLeft?.Invoke(userArgs);
     }
 
+    public override void OnRtcStats(RtcConnection connection, RtcStats stats)
+    {
+
+    }
+
+    public override void OnNetworkQuality(RtcConnection connection, uint remoteUid, int txQuality, int rxQuality)
+    {
+    }
+
+    public override void OnLocalVideoStats(RtcConnection connection, LocalVideoStats stats)
+    {
+        Debug.Log("Local video stats callback for user " + connection.localUid);
+        OnLocalVideoStatsEvent?.Invoke(stats);
+    }
+
+    public override void OnRemoteVideoStats(RtcConnection connection, RemoteVideoStats stats)
+    {
+        Debug.Log("Remote video stats callback for user " + connection.localUid);
+
+        OnRemoteVideoStatsEvent?.Invoke(stats);
+
+    }
 }

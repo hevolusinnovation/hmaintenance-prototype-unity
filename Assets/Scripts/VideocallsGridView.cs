@@ -5,6 +5,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class VideocallsGridView : MonoBehaviour
 {
@@ -56,13 +57,11 @@ public class VideocallsGridView : MonoBehaviour
             Debug.LogError("frame controller component not found", this);
             return null;
         }
-
     }
-
     public void RemoveFrame(uint id)
     {
-        
 
-        
+
     }
+
 }

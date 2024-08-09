@@ -21,14 +21,14 @@ public class VideocallHandler : MonoBehaviour
 
     private void OnEnable()
     {
-        AgoraCallbackHandler.RemoteUserJoined += RemoteUserJoinedHandler;
-        AgoraCallbackHandler.RemoteUserLeft += RemoteUserLeftHandler;
+        AgoraCallbackHandler.OnRemoteUserJoined += RemoteUserJoinedHandler;
+        AgoraCallbackHandler.OnRemoteUserLeft += RemoteUserLeftHandler;
 
     }
     private void OnDisable()
     {
-        AgoraCallbackHandler.RemoteUserJoined -= RemoteUserJoinedHandler;
-        AgoraCallbackHandler.RemoteUserLeft -= RemoteUserLeftHandler;
+        AgoraCallbackHandler.OnRemoteUserJoined -= RemoteUserJoinedHandler;
+        AgoraCallbackHandler.OnRemoteUserLeft -= RemoteUserLeftHandler;
 
     }
 
@@ -82,6 +82,8 @@ public class VideocallHandler : MonoBehaviour
         context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
         // Initialize the instance
         _rtcEngine.Initialize(context);
+
+        
     }
 
     public void Join()
@@ -106,7 +108,7 @@ public class VideocallHandler : MonoBehaviour
             
             options.channelProfile.SetValue(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_COMMUNICATION);
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            SetVideoEncoderConfiguration();
+            
 
             _rtcEngine.JoinChannel(AgoraConf.Token, AgoraConf.ChannelName, 0, options);
 
@@ -124,7 +126,7 @@ public class VideocallHandler : MonoBehaviour
         VideoEncoderConfiguration config = new VideoEncoderConfiguration
         {
             dimensions = new VideoDimensions(640, 360), // Risoluzione 640x360
-            frameRate = 10, // Frame rate 10 fps
+            frameRate = 15, // Frame rate 10 fps
             bitrate = 400, // Bitrate 400 Kbps
             orientationMode = ORIENTATION_MODE.ORIENTATION_MODE_ADAPTIVE
         };
@@ -142,6 +144,7 @@ public class VideocallHandler : MonoBehaviour
         }
 
         CallFrameController frame = _videocallsGridView.CreateFrame();
+        
         if (frame == null)
         {
             Debug.LogError("Error during frame view instantiation");
